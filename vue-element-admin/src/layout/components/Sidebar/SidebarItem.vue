@@ -31,7 +31,6 @@ import { isExternal } from '@/utils/validate'
 import Item from './Item'
 import AppLink from './Link'
 import FixiOSBug from './FixiOSBug'
-
 export default {
   name: 'SidebarItem',
   components: { Item, AppLink },
@@ -68,18 +67,20 @@ export default {
           return true
         }
       })
-
       // When there is only one child router, the child router is displayed by default
       if (showingChildren.length === 1) {
         return true
       }
-
+      // console.log(parent.children,'parent')
       // Show parent if there are no child router to display
       if (showingChildren.length === 0) {
-        this.onlyOneChild = { ... parent, path: '', noShowingChildren: true }
+        this.onlyOneChild = { ...parent, path: '', noShowingChildren: true }
+        if (parent.children) {
+          parent.alwaysShow = false
+          parent.hidden = true
+        }
         return true
       }
-
       return false
     },
     resolvePath(routePath) {
@@ -91,7 +92,6 @@ export default {
       }
       return path.resolve(this.basePath, routePath)
     },
-
     generateTitle
   }
 }

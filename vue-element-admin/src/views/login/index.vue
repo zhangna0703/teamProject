@@ -62,12 +62,11 @@
 <script>
 import SocialSign from './socialSignin'
 import { mapActions } from 'vuex'
-
 export default {
   name: 'Login',
   components: { SocialSign },
   data() {
-    // 用户名的自定义检测
+    // 用户名的自定义校验
     const validateUsername = (rule, value, callback) => {
       if (!value) {
         callback(new Error('Please enter the correct user name'))
@@ -75,6 +74,7 @@ export default {
         callback()
       }
     }
+    // 密码校验
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
         callback(new Error('The password can not be less than 6 digits'))
@@ -139,10 +139,13 @@ export default {
       })
     },
     handleLogin() {
+      _hmt.push(['_trackEvent', '考试管理平台', 'tap', '登录按钮点击'])
       this.$refs.loginForm.validate(async valid => {
         if (valid) {
+          console.log(this.loginForm)
           this.loading = true
-          const res = await this.login(this.loginForm)
+          var res = await this.login(this.loginForm)
+          console.log('login res...', res)
           if (res.code === 1) {
             this.$router.push({ path: this.redirect || '/' })
           }

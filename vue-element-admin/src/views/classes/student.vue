@@ -6,38 +6,32 @@
         <el-input v-model="input" style="width: 165px; margin-right: 15px;" placeholder="请输入学生姓名" />
         <el-select v-model="value" style="width: 165px; margin-right: 15px;" placeholder="请选择教室号">
           <el-option
-            v-for="item in roomArr"
-            :key="item"
-            :label="item"
-            :value="item"
+            v-for="item in roomarr"
+            :key="item.room_id"
+            :label="item.room_text"
+            :value="item.room_text"
           />
         </el-select>
         <el-select v-model="valueclass" style="width: 165px; margin-right: 15px;" placeholder="班级名">
           <el-option
-            v-for="item in classArr"
-            :key="item"
-            :label="item"
-            :value="item"
+            v-for="item in arr"
+            :key="item.grade_id"
+            :label="item.grade_name"
+            :value="item.grade_name"
           />
         </el-select>
         <el-button type="primary" class="button" @click="search">搜索</el-button>
-        <el-button type="primary" class="button">重置</el-button>
+        <el-button type="primary" class="button" @click="reset">重置</el-button>
+        <el-button type="primary" class="button" @click="exportExcel">导出学生</el-button>
       </div>
-      <el-table
-        :data="arrClass.length>0?arrClass.slice((currentpage-1)*pagesize,currentpage*pagesize):allStud.studentarr.slice((currentpage-1)*pagesize,currentpage*pagesize)"
-        style="width: 100%"
-      >
-        <el-table-column
-          label="姓名"
-          width="216"
-        >
+      <el-table :data="arrClass.length > 0 ? arrClass.slice((currentpage - 1) * pagesize, currentpage * pagesize):allStud.slice((currentpage - 1) * pagesize, currentpage * pagesize)" style="width: 100%">
+        <el-table-column label="姓名">
           <template slot-scope="scope">
             {{ scope.row.student_name }}
           </template>
         </el-table-column>
         <el-table-column
           label="学号"
-          width="359"
         >
           <template slot-scope="scope">
             {{ scope.row.student_id }}
@@ -45,7 +39,6 @@
         </el-table-column>
         <el-table-column
           label="班级"
-          width="216"
         >
           <template slot-scope="scope">
             {{ scope.row.grade_name }}
@@ -53,7 +46,6 @@
         </el-table-column>
         <el-table-column
           label="教室"
-          width="204"
         >
           <template slot-scope="scope">
             {{ scope.row.room_text }}
@@ -61,7 +53,6 @@
         </el-table-column>
         <el-table-column
           label="密码"
-          width="459"
         >
           <template slot-scope="scope">
             {{ scope.row.student_pwd }}
@@ -82,83 +73,118 @@
           :page-sizes="[5, 10, 20, 50, 100]"
           :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="allStud.studentarr.length"
+          :total="allStud.length"
           @size-change="changeSize"
           @current-change="changeYe"
         />
       </div>
     </div>
+    <div class="app-container">
+      <upload-excel-component :on-success="handleSuccess" :before-upload="beforeUpload" />
+      <el-table :data="tableData" border highlight-current-row style="width: 100%;margin-top:20px;">
+        <el-table-column v-for="item of tableHeader" :key="item" :prop="item" :label="item" />
+      </el-table>
+    </div>
   </div>
 </template>
 
 <script>
+import UploadExcelComponent from '@/components/UploadExcel/index.vue'
 import { mapState, mapActions } from 'vuex'
 export default {
+  name: 'UploadExcel',
+  components: { UploadExcelComponent },
   data() {
     return {
       arrClass: [],
       input: '',
       value: '',
       valueclass: '',
-      allData: [],
       currentpage: 1,
       pagesize: 10,
-      roomArr: [],
-      classArr: []
+      tableData: [],
+      tableHeader: []
     }
   },
   computed: {
     ...mapState({
-      allStud: state => state.classes
+      allStud: state => state.classes.studentarr,
+      arr: state => state.classes.arr,
+      roomarr: state => state.classes.roomarr
     })
   },
-  created() {
-    this.student()
-    const roomarr = []
-    const classarr = []
-    this.allStud.studentarr.forEach((item, ind) => {
-      if (roomarr.indexOf(item.room_text) === -1) {
-        roomarr.push(item.room_text)
-      }
-      if (classarr.indexOf(item.grade_name) === -1) {
-        classarr.push(item.grade_name)
-      }
-    })
-    this.roomArr = roomarr
-    this.classArr = classarr
+  async created() {
+    await this.student()
+    this.allclass()
+    this.allroom()
   },
   methods: {
     ...mapActions({
       student: 'classes/allStudent',
+      allclass: 'classes/allClass',
+      allroom: 'classes/allRoom',
       deletestudent: 'classes/deletestudent'
     }),
+    beforeUpload(file) {
+      const isLt1M = file.size / 1024 / 1024 < 1
+      if (isLt1M) {
+        return true
+      }
+      this.$message({
+        message: 'Please do not upload files larger than 1m in size.',
+        type: 'warning'
+      })
+      return false
+    },
+    handleSuccess({ results, header }) {
+      this.tableData = results
+      this.tableHeader = header
+    },
     deleteRow(id) {
       this.deletestudent(id)
       this.student()
     },
-    changeYe(val) {
+    changeYe(val) { //  当前第几页
       this.currentpage = val
     },
-    changeSize(val) {
+    changeSize(val) { //  多少条每页
       this.pagesize = val
+    },
+    reset() {
+      this.input = ''
+      this.value = ''
+      this.valueclass = ''
+      this.student()
     },
     search() {
       if (this.input && this.value && this.valueclass) {
-        const arr = this.allStud.studentarr.filter((item, ind) => {
+        this.arrClass = this.allStud.filter((item, ind) => {
           return this.input === item.student_name && this.value === item.room_text && this.valueclass === item.grade_name
         })
-        this.arrClass = arr
-      } else if ((this.input && this.value) || (this.value && this.valueclass) || (this.input && this.valueclass) || (this.value && this.valueclass)) {
-        const arr = this.allStud.studentarr.filter((item, ind) => {
+      } else if ((this.input && this.value) || (this.value && this.valueclass) || (this.input && this.valueclass)) {
+        this.arrClass = this.allStud.filter((item, ind) => {
           return (this.input === item.student_name && this.value === item.room_text) || (this.value === item.room_text && this.valueclass === item.grade_name) || (this.input === item.student_name && this.valueclass === item.grade_name)
         })
-        this.arrClass = arr
       } else {
-        const arr = this.allStud.studentarr.filter((item, ind) => {
-          return this.input === item.student_name || this.value === item.rooxm_text || this.valueclass === item.grade_name
+        this.arrClass = this.allStud.filter((item, ind) => {
+          return this.input === item.student_name || this.value === item.room_text || this.valueclass === item.grade_name
         })
-        this.arrClass = arr
       }
+    },
+    exportExcel() {
+      const header = Object.keys(this.allStud[0])
+      const list = this.allStud.map(item => {
+        const arr = Object.values(item)
+        return arr.map(item => JSON.stringify(item))
+      })
+      import('@/vendor/Export2Excel').then(excel => {
+        excel.export_json_to_excel({
+          header: header,
+          data: list,
+          filename: '',
+          bookType: 'xlsx'
+        })
+      })
     }
   }
 }
@@ -216,4 +242,3 @@ export default {
     box-sizing: border-box;
   }
 </style>
-

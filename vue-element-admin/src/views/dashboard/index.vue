@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import adminDashboard from './admin'
 import editorDashboard from './editor'
 
@@ -18,12 +18,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'roles'
-    ])
+    ...mapState({
+      identity_text: state => state.user.userInfo.identity_text
+    })
   },
   created() {
-    if (!this.roles.includes('admin')) {
+    if (this.identity_text === '管理员') {
       this.currentRole = 'editorDashboard'
     }
   }

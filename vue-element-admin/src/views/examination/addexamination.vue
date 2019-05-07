@@ -6,11 +6,11 @@
         <el-form ref="formData" :rules="rules" class="add-form" :model="formData">
           <el-form-item class="add-form-item" label="试卷名称:" prop="title" required>
             <br>
-            <el-input v-model="formData.title" size="medium" style="width:45%" class="add-form-item-control-wrapper" />
+            <el-input v-model="formData.title" size="medium" style="width:45%" />
           </el-form-item>
           <el-form-item class="add-form-item" label="选择考试类型:" prop="typeId" required>
             <br>
-            <el-select v-model="formData.typeId" placeholder="请选择" class="add-form-item-control-wrapper">
+            <el-select v-model="formData.typeId" placeholder="请选择">
               <el-option
                 v-for="(item,index) in typeList"
                 :key="index"
@@ -21,7 +21,7 @@
           </el-form-item>
           <el-form-item class="add-form-item" label="选择课程:" prop="classId" required>
             <br>
-            <el-select v-model="formData.classId" placeholder="请选择" class="add-form-item-control-wrapper">
+            <el-select v-model="formData.classId" placeholder="请选择">
               <el-option
                 v-for="item in curriculumList"
                 :key="item.subject_id"
@@ -32,7 +32,7 @@
           </el-form-item>
           <el-form-item class="add-form-item" label="设置题量:" prop="num" required>
             <br>
-            <el-input-number v-model="formData.num" controls-position="right" :min="4" :max="10" value="0" class="add-form-item-control-wrapper" />
+            <el-input-number v-model="formData.num" controls-position="right" :min="4" :max="10" value="0" />
           </el-form-item>
           <el-form-item label="考试时间:">
             <br>
@@ -116,7 +116,6 @@ export default {
           window.localStorage.setItem('exam', JSON.stringify(res))
           this.$router.push({ path: 'add' })
         } else {
-          console.log('error submit!!')
           return false
         }
       })

@@ -100,7 +100,6 @@ const actions = {
   // 展示身份与api接口权限
   async showApiAuth({ commit }, payload) {
     var data = await showApi()
-    // console.log(data)
     commit('CHANGE_DATALIST', data)
   },
   // 展示身份与视图接口

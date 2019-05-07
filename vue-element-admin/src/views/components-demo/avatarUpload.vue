@@ -39,7 +39,7 @@ export default {
     }
   },
   methods: {
-    cropSuccess(resData,e) {
+    cropSuccess(resData, e) {
       console.log(e)
       this.imagecropperShow = false
       this.imagecropperKey = this.imagecropperKey + 1

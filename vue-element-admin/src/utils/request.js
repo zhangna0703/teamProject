@@ -9,9 +9,11 @@ import { getToken } from '@/utils/auth'
 // create an axios instance
 const service = axios.create({
   // baseURL: 'http://169.254.121.1:7001', // api 的 base_url
-  baseURL: '/api'
+  // baseURL: 'api'
+  baseURL: /jasonandjay\.com/.test(window.location.host) ? 'https://exam.jasonandjay.com/' : '/api'
   // withCredentials: true // 跨域请求时发送 cookies
   // timeout: 5000 // request timeout
+  // baseURL: '/api'
 })
 
 // request interceptor

@@ -18,7 +18,7 @@
             />
           </el-select>
         </div>
-        <el-button type="primary"><i class="el-icon-search" />查询</el-button>
+        <el-button type="primary" @click="getList"><i class="el-icon-search" />查询</el-button>
       </form>
     </div>
     <div class="add-layout-content">
@@ -46,17 +46,24 @@
         >
           <template slot-scope="scope">
             {{ scope.row.status ? '已阅' : '未阅' }}
-          </template></el-table-column>
+          </template>
+        </el-table-column>
         <el-table-column
-          prop="start_time"
           label="开始时间"
           width="210"
-        />
+        >
+          <template slot-scope="scope">
+            <span>{{ new Date(scope.row.start_time * 1).toLocaleString() }}</span>
+          </template>
+        </el-table-column>
         <el-table-column
-          prop="end_time"
           label="结束时间"
           width="210"
-        />
+        >
+          <template slot-scope="scope">
+            <span>{{ new Date(scope.row.end_time * 1).toLocaleString() }}</span>
+          </template>
+        </el-table-column>
         <el-table-column
           label="成材率"
           width="100"
@@ -111,12 +118,11 @@ export default {
       data: state => state.readPapers.classArr
     })
   },
-  async created() {
-    var obj = JSON.parse(window.localStorage.getItem('classMsg'))
+  async created() {},
+  async mounted() {
+    var obj = JSON.parse(localStorage.getItem('classMsg'))
     this.id = obj.id
     this.room = obj.name
-  },
-  async mounted() {
     await this.getExamType()
     await this.getStudent({
       grade_id: this.id
@@ -138,6 +144,13 @@ export default {
     async handleCurrentChange(tab) {
       this.page = tab
       this.arr = this.studentData.slice((this.page - 1) * this.size, this.page * this.size)
+    },
+    async getList() {
+      // console.log(this.classList.value)
+      await this.getStudent({
+        grade_id: this.classList.value
+      })
+      this.arr = this.studentData.slice(0, this.size * 1)
     },
     getScore(eid, nid, name) {
       window.localStorage.setItem('examIds', JSON.stringify({

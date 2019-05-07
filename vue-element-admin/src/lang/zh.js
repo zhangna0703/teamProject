@@ -79,7 +79,8 @@ export default {
     Addexamination: '添加考试',
     Listexamination: '试卷列表',
     add: '创建试卷',
-    detail: '详情页'
+    detail: '详情页',
+    headImage: '头像上传'
   },
   navbar: {
     logOut: '退出登录',

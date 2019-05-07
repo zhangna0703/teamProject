@@ -2,15 +2,15 @@
   <div class="layout" style="padding: 0px 24px 24px;">
     <h2 style="padding: 20px 0px; margin-top: 10px;">班级管理</h2>
     <div class="layout-content">
-      <el-button type="primary" class="button" @click="dialogFormVisible = true">+添加班级</el-button>
+      <el-button type="primary" class="button" @click="showAdd">+添加班级</el-button>
       <el-table :data="allArr.arr" style="width: 100%">
-        <el-table-column label="班级名" width="311">
+        <el-table-column label="班级名">
           <template slot-scope="scope">{{ scope.row.grade_name }}</template>
         </el-table-column>
-        <el-table-column label="课程名" width="460">
+        <el-table-column label="课程名">
           <template slot-scope="scope">{{ scope.row.subject_text }}</template>
         </el-table-column>
-        <el-table-column label="教室号" width="315">
+        <el-table-column label="教室号">
           <template slot-scope="scope">{{ scope.row.room_text }}</template>
         </el-table-column>
         <el-table-column label="操作">
@@ -30,16 +30,16 @@
     </div>
     <!-- 添加班级 -->
     <el-dialog title="添加班级" :visible.sync="dialogFormVisible" width="520px" height="317px">
-      <el-form :model="form">
-        <el-form-item label="班级名" :label-width="formLabelWidth">
+      <el-form ref="form" :rules="rules" :model="form">
+        <el-form-item label="班级名" :label-width="formLabelWidth" prop="name">
           <el-input v-model="form.name" autocomplete="off" placeholder="班级名" />
         </el-form-item>
-        <el-form-item label="教室号" :label-width="formLabelWidth">
+        <el-form-item label="教室号" :label-width="formLabelWidth" prop="roomid">
           <el-select v-model="form.roomid" placeholder="请选择">
             <el-option v-for="(item,index) in allArr.arr" :key="index" :label="item.room_text" :value="item.room_id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="课程名" :label-width="formLabelWidth">
+        <el-form-item label="课程名" :label-width="formLabelWidth" prop="subjectid">
           <el-select v-model="form.subjectid" placeholder="请选择">
             <el-option v-for="(item,index) in allArr.arr" :key="index" :label="item.subject_text" :value="item.subject_id" />
           </el-select>
@@ -47,7 +47,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addClasses">提 交</el-button>
+        <el-button type="primary" @click="addClasses('form')">提 交</el-button>
       </div>
     </el-dialog>
     <!-- 修改班级 -->
@@ -94,7 +94,12 @@ export default {
         subjectText: '',
         roomid: ''
       },
-      formLabelWidth: '120px'
+      formLabelWidth: '120px',
+      rules: {
+        name: [{ required: true, message: '请输入班级名', trigger: 'blur' }],
+        roomid: [{ required: true, message: '请选择教室号', trigger: 'change' }],
+        subjectid: [{ required: true, message: '请选择课程名', trigger: 'change' }]
+      }
     }
   },
   computed: {
@@ -112,11 +117,22 @@ export default {
       deletegrade: 'classes/deletegrade',
       updategrade: 'classes/updategrade'
     }),
-    async addClasses() {
-      this.dialogFormVisible = false
-      const obj = this.form
-      await this.addgrade({ grade_name: obj.name, room_id: obj.roomid, subject_id: obj.subjectid })
-      await this.allClass()
+    showAdd() {
+      this.dialogFormVisible = true
+      this.form.name = ''
+      this.form.roomid = ''
+      this.form.subjectid = ''
+    },
+    addClasses(form) {
+      this.$refs[form].validate(async(valid) => {
+        if (valid) {
+          this.dialogFormVisible = false
+          await this.addgrade({ grade_name: this.form.name, room_id: this.form.roomid, subject_id: this.form.subjectid })
+          await this.allClass()
+        } else {
+          return false
+        }
+      })
     },
     deleteRow(id) {
       this.deletegrade({ grade_id: id })
@@ -131,8 +147,13 @@ export default {
     },
     async editClass(value) {
       this.mark = false
+      // console.log(value,this.edit)
+      // if ( this.edit.subjectText === value.subjectText || this.edit.roomText === value.roomText ) {
+      //   return false
+      // } else {
       await this.updategrade({ grade_id: value.gradeid, grade_name: value.name, subject_id: value.subjectText, room_id: value.roomText })
       await this.allClass()
+      // }
     }
   }
 }
@@ -151,6 +172,9 @@ export default {
     background: #f0f2f5;
     min-height: 0;
   }
+  /* .el-table__body-wrapper{
+    width: 100%;
+  } */
   thead{
     color: rgba(0, 0, 0, 0.85)!important;
     background: #f0f2f5!important;

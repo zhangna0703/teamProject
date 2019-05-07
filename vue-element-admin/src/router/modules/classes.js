@@ -7,6 +7,7 @@ const examRouter = {
   component: Layout,
   redirect: 'noredirect',
   name: 'Classes',
+  alwaysShow: true,
   meta: {
     title: 'classes',
     icon: 'table'
@@ -16,19 +17,19 @@ const examRouter = {
       path: 'class',
       component: () => import('@/views/classes/class'),
       name: 'class',
-      meta: { title: 'class', noCache: true }
+      meta: { title: 'class', noCache: true, view_id: 'main-grade' }
     },
     {
       path: 'classroom',
       component: () => import('@/views/classes/classroom'),
       name: 'classroom',
-      meta: { title: 'classroom', noCache: true }
+      meta: { title: 'classroom', noCache: true, view_id: 'main-student' }
     },
     {
       path: 'student',
       component: () => import('@/views/classes/student'),
       name: 'student',
-      meta: { title: 'student', noCache: true }
+      meta: { title: 'student', noCache: true, view_id: 'main-room' }
     }
   ]
 }

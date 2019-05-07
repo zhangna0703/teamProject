@@ -6,25 +6,20 @@
         <div class="style_buttons">
           <button type="button" class="btn" @click="dialogVisible = true">
             <i class="el-icon-plus" />
-            <span>添加类型</span>
+            <el-button style="color:#fff" type="text" @click="open3">添加类型</el-button>
           </button>
         </div>
         <div class="style_lists">
           <el-table :data="questionsType" style="width: 100%">
             <el-table-column prop="questions_type_id" label="类型ID" width="280" />
             <el-table-column prop="questions_type_text" label="类型名称" width="280" />
-            <el-table-column prop="address" label="操作" />
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button type="text" @click="open6(scope.row.questions_type_id)">删除</el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
-        <el-dialog title="创建新类型" :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
-          <div class="title">
-            <input v-model="ivalue" class="ipt" placeholder="请输入类型名称" type="text">
-          </div>
-          <span slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="sbmit">确 定</el-button>
-            <el-button @click="dialogVisible = false">取 消</el-button>
-          </span>
-        </el-dialog>
       </div>
     </div>
   </div>
@@ -36,7 +31,8 @@ export default {
     return {
       dialogVisible: false,
       code: '',
-      ivalue: ''
+      ivalue: '',
+      msg: ''
     }
   },
   computed: {
@@ -50,7 +46,7 @@ export default {
   methods: {
     createCode() {
       const codeArr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-      const length = 12
+      const length = 16
       this.code = ''
       for (let i = 0; i < length; i++) {
         var randomI = Math.floor(Math.random() * 36)
@@ -58,14 +54,9 @@ export default {
       }
     },
     ...mapActions({
-      getUser: 'addQuestion/getUser',
-      getAllExam: 'addQuestion/getAllExam',
-      getExamType: 'addQuestion/getExamType',
-      addQuestions: 'addQuestion/addQuestions',
-      upQuestions: 'addQuestion/upQuestions',
-      getSubjectType: 'addQuestion/getSubjectType',
       getQuestionsTpe: 'addQuestion/getQuestionsTpe',
-      addType: 'addQuestion/addType'
+      addType: 'addQuestion/addType',
+      delType: 'addQuestion/delType'
     }),
     async sbmit() {
       await this.createCode()
@@ -74,13 +65,53 @@ export default {
         text: this.ivalue,
         sort: this.code
       })
+      // this.msg = res.msg
+      // if (res.code === 1) {
+      //   this.$message({
+      //     type: 'success',
+      //     message: this.msg
+      //   });
+      // }
     },
-    handleClose(done) {
-      this.$confirm('确认关闭？')
-        .then(_ => {
-          done()
+    // async delet(id) {
+    //   await this.delType({ id:id })
+    // },
+    open6(id) {
+      this.$confirm('此操作将删除该试题类型, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        this.delType({ id: id })
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
         })
-        .catch(_ => {})
+        this.getQuestionsTpe()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    open3() {
+      this.$prompt('创建新类型', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /\S/,
+        center: true,
+        inputErrorMessage: '类型不能为空'
+      }).then(({ value }) => {
+        this.ivalue = value
+        this.sbmit()
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        })
+      })
     }
   }
 }

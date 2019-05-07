@@ -7,6 +7,7 @@ const headImageRouter = {
   component: Layout,
   redirect: 'noredirect',
   name: 'headImage',
+  hidden: true,
   meta: {
     title: 'headImage',
     icon: 'table'
@@ -16,7 +17,7 @@ const headImageRouter = {
       path: 'index',
       component: () => import('@/views/headImage'),
       name: 'headImages',
-      meta: { title: '头像上传', noCache: true }
+      meta: { title: 'headImage', noCache: true }
     }
   ]
 }

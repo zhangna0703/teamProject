@@ -42,20 +42,7 @@
             <markdown-editor ref="markdownEditor" v-model="content1" height="300px" />
           </div>
         </form>
-        <button class="sbmit" type="primary" @click="dialogVisible = true">提交</button>
-        <el-dialog :visible.sync="dialogVisible" width="30%" :before-close="handleClose">
-          <span>{{ question }}</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="sure">确 定</el-button>
-          </span>
-        </el-dialog>
-        <el-dialog :visible.sync="dialogVisible1" width="30%" :before-close="handleClose">
-          <span>{{ msg }}</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="dialogVisible1 = false">知道了</el-button>
-          </span>
-        </el-dialog>
+        <button class="sbmit" type="text" @click="open">提交</button>
       </div>
     </div>
   </div>
@@ -73,8 +60,6 @@ export default {
       question: '你确定要添加这道试题吗?真的要添加吗？',
       content: '',
       content1: '',
-      dialogVisible: false,
-      dialogVisible1: false,
       id: '',
       msg: '添加试题失败',
       value: '',
@@ -82,28 +67,7 @@ export default {
       svalue: '',
       evalue: '',
       qvalue: '',
-      questions_id: '',
-      tableData: [{
-        information: 'Nodejs开发第二周摸底考试',
-        class: '1608',
-        creator: '陈',
-        startTime: '2019-3-10',
-        endTime: '2019-3-17'
-      },
-      {
-        information: '渐进式',
-        class: '1609',
-        creator: '王',
-        startTime: '2019-3-10',
-        endTime: '2019-3-17'
-      },
-      {
-        information: '组件式',
-        class: '1610',
-        creator: '任',
-        startTime: '2019-3-10',
-        endTime: '2019-3-17'
-      }]
+      questions_id: ''
     }
   },
   computed: {
@@ -150,15 +114,45 @@ export default {
       getSubjectType: 'addQuestion/getSubjectType',
       getQuestionsTpe: 'addQuestion/getQuestionsTpe'
     }),
+    open() {
+      this.$confirm(this.question, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        this.sure()
+      }).catch(() => {})
+    },
+    opens() {
+      this.$confirm(this.msg, '提示', {
+        cancelButtonText: '知道了',
+        type: 'warning',
+        center: true,
+        showClose: false,
+        showConfirmButton: false
+      }).then(() => {
+        this.$message({
+          type: 'success',
+          message: this.msg
+        })
+      }).catch(() => {})
+    },
     async sure() {
-      var obj = {
-        questions_type_id: this.qvalue,
-        questions_answer: this.content1,
-        questions_stem: this.tvalue,
-        subject_id: this.svalue,
-        exam_id: this.evalue,
-        user_id: this.userInfo.user_id,
-        title: this.content
+      var obj = {}
+      if (this.qvalue && this.content1 && this.tvalue && this.svalue && this.evalue && this.userInfo.user_id && this.content) {
+        obj = {
+          questions_type_id: this.qvalue,
+          questions_answer: this.content1,
+          questions_stem: this.tvalue,
+          subject_id: this.svalue,
+          exam_id: this.evalue,
+          user_id: this.userInfo.user_id,
+          title: this.content
+        }
+      } else {
+        this.msg = '缺少必填参数'
+        return this.opens()
       }
       var obj1 = {
         questions_type_id: this.qvalue,
@@ -170,32 +164,29 @@ export default {
         questions_id: this.questions_id,
         title: this.content
       }
-      this.dialogVisible = false
-      this.dialogVisible1 = true
       var res = null
-      console.log(this.question)
       if (this.question === '您要修改吗，确定要修改这道题吗') {
-        console.log(obj, '123123131')
         res = await this.upQuestions(obj1)
       } else {
         res = await this.addQuestions(obj)
+        this.qvalue = ''
+        this.content1 = ''
+        this.tvalue = ''
+        this.svalue = ''
+        this.evalue = ''
+        this.userInfo.user_id = ''
+        this.content = ''
       }
       if (res.msg) {
         this.msg = res.msg
       }
-    },
-    handleClose(done) {
-      this.$confirm('确认关闭？')
-        .then(_ => {
-          done()
-        })
-        .catch(_ => {})
+      this.opens()
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 .wrap{
   padding: 0px 24px 24px;
   background: #f0f2f5;

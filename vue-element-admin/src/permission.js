@@ -21,7 +21,6 @@ router.beforeEach(async(to, from, next) => {
 
   // determine whether the user has logged in
   const hasToken = getToken()
-
   if (hasToken) {
     if (to.path === '/login') {
       // if is logged in, redirect to the home page
@@ -40,22 +39,16 @@ router.beforeEach(async(to, from, next) => {
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           // 1.如果没有用户信息就去获取用户信息
           const userInfo = await store.dispatch('user/getInfo')
-          console.log('userInfo...', userInfo)
-
+          console.log(userInfo)
           // 2.通过身份获取权限
-          const viewAuthority = await store.dispatch('user/getViewAuthority')
-
+          const viewAuthority = await store.dispatch('user/getViewAuthority', userInfo.user_id)
+          // console.log(viewAuthority,'viewAuthority')
           // 3.通过权限生成路由
           const accessRoutes = await store.dispatch('permission/generateRoutes', viewAuthority)
-
           // 4.动态添加路由到路由表
           router.addRoutes(accessRoutes)
-
-          // // hack method to ensure that addRoutes is complete
-          // // set the replace: true, so the navigation will not leave a history record
           next({ ...to, replace: true })
         } catch (error) {
-          console.log('error....', error)
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
           Message.error(error || 'Has Error')

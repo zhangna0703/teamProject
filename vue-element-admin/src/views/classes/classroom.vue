@@ -4,7 +4,7 @@
     <div class="layout-content">
       <el-button type="primary" class="button" @click="dialogFormVisible = true">+添加教室</el-button>
       <el-table :data="allRoom.roomarr" style="width: 100%">
-        <el-table-column label="姓名" width="695">
+        <el-table-column label="姓名">
           <template slot-scope="scope">
             {{ scope.row.room_text }}
           </template>
@@ -20,15 +20,15 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-dialog title="添加教室" :visible.sync="dialogFormVisible" width="520px" height="317px">
-      <el-form :model="form">
-        <el-form-item label="教室号" :label-width="formLabelWidth">
-          <el-input v-model="form.name" autocomplete="off" placeholder="教室号" />
+    <el-dialog title="添加教室" :visible.sync="dialogFormVisible" height="317px">
+      <el-form ref="form" :model="form" :rules="rules">
+        <el-form-item prop="room" label="教室号" class="info">
+          <el-input v-model="form.room" autocomplete="off" placeholder="教室号" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="sure">确 定</el-button>
+        <el-button type="primary" @click="sure('form')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -41,9 +41,11 @@ export default {
     return {
       dialogFormVisible: false,
       form: {
-        name: ''
+        room: ''
       },
-      formLabelWidth: '120px'
+      rules: {
+        room: [{ required: true, message: '请输入教室名', trigger: 'blur' }]
+      }
     }
   },
   computed: {
@@ -61,10 +63,16 @@ export default {
       allAddroom: 'classes/allAddroom',
       deletecurrent: 'classes/deleteroom'
     }),
-    async sure() {
-      this.dialogFormVisible = false
-      await this.allAddroom({ room_text: this.form.name })
-      await this.room()
+    sure(form) {
+      this.$refs[form].validate(async(valid) => {
+        if (valid) {
+          this.dialogFormVisible = false
+          await this.allAddroom({ room_text: this.form.room })
+          await this.room()
+        } else {
+          return false
+        }
+      })
     },
     open2(id) {
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {

@@ -1,7 +1,7 @@
 <template>
   <div class="wrap">
     <div class="head">
-      <h3>展示用户</h3>
+      <h3>展示用户<el-button type="primary" style="margin-left: 80%;" @click="exortTable">导出数据</el-button></h3>
       <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
         <el-tab-pane label="用户管理" name="first" style="font-size:26px; font-weight:normal; padding:10px 20px;">用户管理</el-tab-pane>
         <el-tab-pane label="身份数据" name="second" style="font-size:26px; font-weight:normal; padding:10px 20px;">身份数据</el-tab-pane>
@@ -42,7 +42,7 @@ export default {
             },
             {
               prop: 'identity_text',
-              label: '用户名'
+              label: '用户身份'
             }
           ]
         }, {
@@ -179,11 +179,38 @@ export default {
       }
       this.index = tab.index
       this.arr = this.date.slice(0, 10)
+    },
+    exortTable() {
+      var header = Object.keys(this.date[0])
+      var list = this.date.map(item => {
+        var arr = Object.values(item)
+        // var arrs = arr.map(item => {
+        //   JSON.stringify(item)
+        //   return item
+        // })
+        return arr
+      })
+      import('@/vendor/Export2Excel').then(excel => {
+        excel.export_json_to_excel({
+          header: header,
+          data: list,
+          filename: '',
+          bookType: 'xls' // 转成文件的后缀名
+        })
+      })
     }
   }
 }
 </script>
 <style scoped>
+.wrap {
+  width: 100%;
+  height: 100%;
+}
+.head {
+  width: 100%;
+  height: 100%;
+}
 .wrap .head h3 {
   width:100%;
   height:50px;

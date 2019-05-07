@@ -1,13 +1,13 @@
 <template>
   <div class="dashboard-editor-container">
     <div class=" clearfix">
-      <pan-thumb :image="avatar" style="float: left">
+      <pan-thumb :image="flag ? userinfo.avatar : ''" style="float: left">
         Your roles:
-        <span v-for="item in roles" :key="item" class="pan-info-roles">{{ item }}</span>
+        <span class="pan-info-roles">{{ userinfo.identity_text }}</span>
       </pan-thumb>
       <github-corner style="position: absolute; top: 0px; border: 0; right: 0;" />
       <div class="info-container">
-        <span class="display_name">{{ name }}</span>
+        <span class="display_name">{{ userinfo.user_name }}</span>
         <span style="font-size:20px;padding-top:20px;display:inline-block;">Editor's Dashboard</span>
       </div>
     </div>
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState, mapActions } from 'vuex'
 import PanThumb from '@/components/PanThumb'
 import GithubCorner from '@/components/GithubCorner'
 
@@ -27,6 +27,7 @@ export default {
   components: { PanThumb, GithubCorner },
   data() {
     return {
+      flag: true,
       emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3'
     }
   },
@@ -35,7 +36,19 @@ export default {
       'name',
       'avatar',
       'roles'
-    ])
+    ]),
+    ...mapState({
+      userinfo: state => state.user.userInfo
+    })
+  },
+  async created() {
+    // 重新获取一下用户信息
+    await this.getUserInfo()
+  },
+  methods: {
+    ...mapActions({
+      getUserInfo: 'user/getInfo'
+    })
   }
 }
 </script>

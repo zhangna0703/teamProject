@@ -1,15 +1,15 @@
 <template>
   <div>
-    <pan-thumb :image="info.avatar" />
-    <el-button type="primary" icon="upload" style="position: absolute;bottom: 15px;margin-left: 40px;" @click="imagecropperShow=true">
-      Change Avatar
+    <pan-thumb :image="info.avatar || image" />
+    <el-button type="primary" icon="upload" style="margin-left: 40px;" @click="imagecropperShow=true">
+      修改头像
     </el-button>
     <image-cropper
       v-show="imagecropperShow"
       :key="imagecropperKey"
       :width="300"
       :height="300"
-      url="http://123.206.55.50:11000/upload"
+      url="https://service.jasonandjay.com/upload"
       method="post"
       lang-type="en"
       @close="close"
@@ -29,7 +29,7 @@ export default {
     return {
       imagecropperShow: false,
       imagecropperKey: 0,
-      image: ''
+      image: 'https://wpimg.wallstcn.com/577965b9-bb9e-4e02-9f0c-095b41417191'
     }
   },
   computed: {
@@ -48,7 +48,7 @@ export default {
     async cropSuccess(e) {
       this.imagecropperShow = false
       await this.updateInfo({ user_id: this.info.user_id, avatar: e[0].path })
-      this.getInfo()
+      await this.getInfo()
     },
     close() {
       this.imagecropperShow = false

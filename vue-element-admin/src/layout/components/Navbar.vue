@@ -36,6 +36,11 @@
               {{ $t('navbar.github') }}
             </el-dropdown-item>
           </a>
+          <router-link to="/headImage/index">
+            <el-dropdown-item>
+              切换头像
+            </el-dropdown-item>
+          </router-link>
           <el-dropdown-item divided>
             <span style="display:block;" @click="logout">{{ $t('navbar.logOut') }}</span>
           </el-dropdown-item>
@@ -103,14 +108,14 @@ export default {
 
 <style lang="scss" scoped>
 .navbar {
-  height: 50px;
+  height: 80px;
   overflow: hidden;
   position: relative;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0,21,41,.08);
 
   .hamburger-container {
-    line-height: 46px;
+    line-height: 80px;
     height: 100%;
     float: left;
     cursor: pointer;
@@ -134,7 +139,7 @@ export default {
   .right-menu {
     float: right;
     height: 100%;
-    line-height: 50px;
+    line-height: 80px;
 
     &:focus {
       outline: none;

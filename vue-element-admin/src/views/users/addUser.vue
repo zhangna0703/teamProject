@@ -48,7 +48,7 @@
             </el-select><br>
             <p>
               <el-button type="primary" @click="changes">确定</el-button>
-              <el-button @click="reset(1)">重置</el-button>
+              <el-button @click="reset(0)">重置</el-button>
             </p>
           </div>
         </div>
@@ -148,7 +148,7 @@
                 v-for="item in viewOpt"
                 :key="item.view_id"
                 :label="item.view_authority_text"
-                :value="item.view_authority_text"
+                :value="item.view_authority_id"
                 style="margin-left:5px;"
               />
             </el-select>
@@ -294,6 +294,11 @@ export default {
         identity_id: num
       })
       if (res.code === 1) {
+        this.add = {
+          name: '',
+          pwd: '',
+          idText: ''
+        }
         Message({
           message: res.msg,
           type: 'success',
@@ -474,12 +479,24 @@ export default {
         identity_id: idNum,
         api_authority_id: apiNum
       })
+      if (!res) {
+        Message({
+          message: '视图权限重复',
+          type: 'error',
+          duration: 5 * 1000
+        })
+        return false
+      }
       if (res.code === 1) {
         Message({
           message: res.msg,
           type: 'success',
           duration: 5 * 1000
         })
+        this.setApi = {
+          idMsg: '',
+          apiMsg: ''
+        }
       }
     },
     // 身份设置视图权限
@@ -503,14 +520,11 @@ export default {
       const item = this.allIden.filter((item) => {
         return item.identity_text === this.viewAuthor.idAuth
       })
-      const array = this.viewOpt.filter((item) => {
-        return item.view_authority_text === this.viewAuthor.viewAuth
-      })
       const idNum = item[0].identity_id
-      const apiNum = array[0].api_authority_id
+      console.log('hahahahahh', this.viewOpt, this.viewAuthor.viewAuth)
       const res = await this.setViewAuth({
         identity_id: idNum,
-        view_authority_id: apiNum
+        view_authority_id: this.viewAuthor.viewAuth
       })
       if (!res) {
         Message({
@@ -525,12 +539,22 @@ export default {
             type: 'success',
             duration: 5 * 1000
           })
+          this.viewAuthor = {
+            idAuth: '',
+            viewAuth: ''
+          }
         }
       }
     },
     reset(num) {
       switch (num) {
         case 0: {
+          this.changeUser = {
+            id: '',
+            name: '',
+            pwd: '',
+            indet: ''
+          }
           break
         }
         case 1: {

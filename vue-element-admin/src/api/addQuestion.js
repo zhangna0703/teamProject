@@ -35,6 +35,14 @@ export function getAddType(params) {
     params
   })
 }
+// 删除指定试题类型
+export function delAddType(params) {
+  return request({
+    url: '/exam/delQuestionsType',
+    method: 'post',
+    data: params
+  })
+}
 // 添加试题
 export function addQuestion(data) {
   return request({

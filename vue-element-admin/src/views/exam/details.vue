@@ -1,29 +1,35 @@
 <template>
-  <div class="box">
+  <div class="wrap">
     <h2 class="tittle">试题详情</h2>
-    <div class="messtitle">
-      <p class="username">
-        <span>出题人: </span>{{ user_name }}</p>
-      <p class="message">题目信息</p>
-      <div class="text">
-        <span class="type_text">{{ questions_type_text }}</span>
-        <span class="subject_text">{{ subject_text }}</span>
-        <span class="exam_name">{{ exam_name }}</span>
+    <div class="all">
+      <div class="messtitle">
+        <p class="username">
+          <span>出题人: </span>{{ user_name }}</p>
+        <p class="message">题目信息</p>
+        <div class="text">
+          <span class="type_text">{{ questions_type_text }}</span>
+          <span class="subject_text">{{ subject_text }}</span>
+          <span class="exam_name">{{ exam_name }}</span>
+        </div>
+        <p class="valu">{{ add }}</p>
+        <VueMarkdown class="mark">{{ add }}</VueMarkdown>
       </div>
-      <p class="valu">
-        {{ add }}
-      </p>
-    </div>
-    <div class="Answer">
-      <p class="message">答案信息</p>
-      <div classs="messagevalue">{{ questions_answer }}</div>
+      <div class="Answer">
+        <p class="message">答案信息</p>
+        <div class="messagevalue">{{ questions_answer }}</div>
+        <VueMarkdown class="mark">{{ questions_answer }}</VueMarkdown>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import VueMarkdown from 'vue-markdown'
 export default {
+  components: {
+    VueMarkdown
+  },
   data() {
     return {
       id: '',
@@ -64,24 +70,28 @@ export default {
 </script>
 
 <style scoped>
-.box {
-  position: relative;
-  width: 100%;
-  height: calc(100vh - 84px);
+.wrap{
+  padding: 0px 24px 24px;
   background: #f0f2f5;
+  display: flex;
+  flex-direction: column;
 }
 
 .tittle {
   padding: 30px 15px;
   font-weight: 200;
 }
-
+.all {
+  display: flex;
+  justify-content: space-between;
+  padding:0 20px;
+  box-sizing: border-box;
+}
 .messtitle {
   width:60%;
   background: white;
   border-radius: 10px;
   margin-left: 20px;
-  float: left;
   margin-right: 20px;
   padding: 24px;
   margin-bottom: 20px;
@@ -91,7 +101,6 @@ export default {
   width: 35%;
   background: white;
   border-radius: 10px;
-  float: left;
   padding: 24px;
   margin-bottom: 20px;
 }
@@ -131,6 +140,11 @@ export default {
 .valu{
   font-size: 14px;
   width: 70%;
-  margin:50px;
-  }
+  margin: 50px;
+}
+.mark /deep/ code {
+  white-space: normal;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
 </style>
